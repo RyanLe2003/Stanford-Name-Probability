@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stanford Unique Name</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <style>
+    .class-info {
+      display: none;
+    }
+  </style>
+  <script>
+    $(document).ready(function() {
+      $('#class-number').on('input', function() {
+        var numClasses = parseInt($(this).val());
+        var currentClasses = $('.class-info').length;
+
+        if (numClasses > currentClasses) {
+          for (var i = currentClasses + 1; i <= numClasses; i++) {
+            var classInfo = '<div class="class-info">';
+            classInfo += '<label><b>Class ' + i + ':</b> </label><br><br>';
+            classInfo += '<label for="class-name-' + i + '">Name: </label>';
+            classInfo += '<input type="text" placeholder="ex. CS109, MATH51" id="class-name-' + i + '" name="class-name-' + i + '" required><br><br>';
+            classInfo += '<label for="class-size-' + i + '">Size: </label>';
+            classInfo += '<input type="number" id="class-size-' + i + '" name="class-size-' + i + '" required><br><br>';
+            classInfo += '<label for="class-availability-' + i + '">Available to: </label>';
+            classInfo += '<select id="class-availability-' + i + '" name="class-availability-' + i + '" required><option value="1">First-Years only </option><option value="2">Second-Years only</option><option value="3">Third-Years only</option><option value="4">Fourth-Years only</option><option value="5">Underclassman only</option><option value="6">Upperclassman only</option><option value="7">All years</option></select><br><br>';
+            classInfo += '</div>';
+
+
+            $('#class-info-container').append(classInfo);
+          }
+        } else if (numClasses < currentClasses) {
+          $('.class-info').slice(numClasses).remove();
+        }
+
+        $('.class-info').show();
+      });
+
+      $('#calculate-button').click(function() {
+        var formData = $('form').serialize();
+        var name = $('#name').val();
+        var gender = $('#gender').val();
+        var personal_gender = $('#personal_gender').val();
+
+        formData += '&name=' + encodeURIComponent(name);
+        formData += '&gender=' + encodeURIComponent(gender);
+        formData += '&personal_gender=' + encodeURIComponent(personal_gender)
+
+        $.ajax({
+          url: '/calculate',
+          type: 'POST',
+          data: formData,
+          success: function(response) {
+            var probability = response.probability
+
+            var result = probability + '%'
+
+            $('#result-container').html(result);
+          },
+          error: function(xhr, status, error) {
+            // Handle the error case
+            console.log('Error:', error);
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>How Unique is my Name? </h1>
+  <p> Have you ever been in a class with someone who shares your name? How about two? What are the odds of that? The following program is designed to determine the odds of someone sharing your name in a class at Stanford (Read more about here https://www.overleaf.com/read/fxrhhvstkghy). Fill out the questions below to see how unique your name is!</p>
+
+  <p> Instructions: 
+    <ol>
+      <li>Input name you want to calculate probability of</li>
+      <li>Input what sex you want to consider (your name could be unisex)</li>
+      <li>Input the number of classes you want to calculate the probability across</li>
+      <li>Input the name of the class (determines gender distribution)</li>
+      <li>Input size of the class</li>
+      <li>Input what class years the class is available to (condition on given years)</li>
+    </ol>
+  </p>
+  <form action="#" method="post" class="form">
+    <label for="name"><b>Name:</b></label>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="personal_gender"><b>Your Sex:</b></label>
+    <select id="personal_gender" name="personal_gender" required>
+      <option value="1">male </option>
+      <option value="2">female</option>
+    </select>
+    <br><br>
+
+    <label for="gender"><b>Sex of Interest:</b></label>
+    <select id="gender" name="gender" required>
+      <option value="1">male </option>
+      <option value="2">female</option>
+      <option value="3">both</option>
+    </select>
+    <br><br>
+
+    <label for="class-number"><b>Number of Classes:</b></label>
+    <input type="number" id="class-number" name="class-number" required><br><br>
+
+    <div id="class-info-container">
+      <div class="class-info">
+        <label><b>Class 1:</b> </label><br><br>
+        <label for="class-name-1">Name:</label>
+        <input type="text" placeholder="ex. CS109, MATH51" id="class-name-1" name="class-name-1" required><br><br>
+
+        <label for="class-size-1">Size:</label>
+        <input type="number" id="class-size-1" name="class-size-1" required><br><br>
+
+        <label for="class-availability">Available to:</label>
+        <select id="class-availability-1" name="class-availability-1" required>
+          <option value="1">First-Years only </option>
+          <option value="2">Second-Years only</option>
+          <option value="3">Third-Years only</option>
+          <option value="4">Fourth-Years only</option>
+          <option value="5">Underclassman only</option>
+          <option value="6">Upperclassman only</option>
+          <option value="7">All years</option>
+        </select>
+        <br><br>
+      </div>
+    </div>
+
+    
+
+    
+  </form>
+  <button type="button" id="calculate-button" class="calculate_button">Calculate</button>
+  <div id="result-container" class="answer"></div>
+</body>
+</html>
