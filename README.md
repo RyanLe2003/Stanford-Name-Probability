@@ -6,4 +6,4 @@ Read more about the calculation here: https://www.overleaf.com/read/fxrhhvstkghy
 
 Video on code: https://youtu.be/OLwfhpVpxEI
 
-Note: The CSV has already filtered out all irrelevant years as the original file was too large.
+Note: The CSV provided only has relevant years as the original file was too large. The code provided still accounts for irrrelevant years.
